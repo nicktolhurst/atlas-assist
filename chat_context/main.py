@@ -1,17 +1,5 @@
-import time
+import time, os
 
-
-CONTEXT_PRELOAD = [
-    {
-        "role": "user",
-        "content": "You can call me Nick. \
-                    I want to refer to you as the Atlas. \
-                    Speak to me as if you were Jarvis from Iron Man \
-                        but do not reference Jarvis or Iron Man. \
-                    Keep responses on short and on point.",
-    },
-    {"role": "assistant", "content": "Ok"},
-]
 
 CHAT_INITIATION_WORDS = ["atlas"]
 
@@ -23,6 +11,7 @@ class Role:
 
 class Chat:
     def __init__(self, logger):
+        CONTEXT_PRELOAD = self.get_context_preload()
         self.context = CONTEXT_PRELOAD
         self.context_preload_length = len(CONTEXT_PRELOAD)
         self.log = logger
@@ -44,6 +33,16 @@ class Chat:
             CHAT_INITIATION_WORDS, in_first=3, words_of=msg
         )
         return in_conversation, msg, start_time
+
+    def get_context_preload(self):
+        return (
+            [
+                {"role": "user", "content": os.environ.get("CONTEXT_PRELOAD")},
+                {"role": "assistant", "content": "Ok"},
+            ]
+            if os.environ.get
+            else []
+        )
 
 
 def start_conversation_when(word_list, in_first, words_of):

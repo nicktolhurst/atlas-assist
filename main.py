@@ -9,17 +9,33 @@ from loguru import logger as log
 import os
 import dotenv
 
-dotenv.load_dotenv()
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-
 
 @log.catch
 async def main_async():
+    dotenv.load_dotenv()  # for .env compatibility
+
+    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+    log.add("output", rotation="10 MB")
+
+    file_path = "path/to/your/file.txt"
+
+    try:
+        with open("context_preload", "r") as file:
+            content = file.read()
+        os.environ.setdefault("CONTEXT_PRELOAD", content)
+    except FileNotFoundError:
+        log.warn(
+            f"The file '{file_path}' does not exist. No context will be pre-loaded."
+        )
+
+    log.info(f"Found context to preload:\n{os.environ.get('CONTEXT_PRELOAD')}")
+
     client = APIClient(log, OPENAI_API_KEY)
     listener = Listener(log)
-    listener.start_listening()
     chat = Chat(log)
     mixer = Mixer(log)
+
+    listener.start_listening()  # TODO: same pattern for all services?
 
     async def _graceful_termination():
         # Stop the mixer playing on the executor thread.

@@ -3,6 +3,7 @@ import re
 import time
 from aiohttp import ClientSession
 
+
 class ChatResponse:
     def __init__(self, response, logger):
         self.log = logger
@@ -64,15 +65,16 @@ class APIClient:
     async def v1_chat_completions_async(
         self, messages, model="gpt-4-vision-preview", max_tokens=500, n=1, temperature=1
     ):
+        json = {
+            "model": model,
+            "messages": messages,
+            "max_tokens": max_tokens,
+            "n": n,
+            "temperature": temperature,
+        }
         async with self.client_session.post(
             "https://api.openai.com/v1/chat/completions",
-            json={
-                "model": model,
-                "messages": messages,
-                "max_tokens": max_tokens,
-                "n": n,
-                "temperature": temperature,
-            },
+            json=json,
             headers={"Authorization": f"Bearer {self.api_key}"},
         ) as response:
             if response.status == 200:
@@ -81,7 +83,7 @@ class APIClient:
                 return ChatResponse(response, self.log)
             elif response.status == 400:
                 self.log.error(
-                    f"STATUS: {response.status} - Invalid request parameters.\n{await response.text()}"
+                    f"STATUS: {response.status} - Invalid request parameters:\n{await response.text()}\nRequest Parameters:\n{json}"
                 )
             else:
                 self.log.error(

@@ -61,6 +61,6 @@ class Listener:
     def get_speech_event(self):
         try:
             event = self.speech_queue.get_nowait()
-            return event, uuid.uuid5("listener", event)
+            return event, uuid.uuid4()
         except queue.Empty:
             return None, None

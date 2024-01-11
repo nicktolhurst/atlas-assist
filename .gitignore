@@ -119,3 +119,6 @@ cython_debug/
 
 # VS Code settings
 .vscode/
+
+# Application Logs
+output
