@@ -1,10 +1,10 @@
 import asyncio
 import time
 import traceback
-from PyMix import Mixer
-from OpenAIClient import APIClient
-from SpeechRecognizer import Listener
-from ChatContext import Chat, Role
+from mixer import Mixer
+from api_client import APIClient
+from listener import Listener
+from chat_context import Chat, Role
 from loguru import logger as log
 import os
 import dotenv

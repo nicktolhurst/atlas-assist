@@ -9,6 +9,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'aiohttp',
+        'aiofiles',
         'loguru',
         'SpeechRecognition',
         'python-dotenv',

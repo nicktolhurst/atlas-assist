@@ -3,7 +3,6 @@ import re
 import time
 from aiohttp import ClientSession
 
-
 class ChatResponse:
     def __init__(self, response, logger):
         self.log = logger
