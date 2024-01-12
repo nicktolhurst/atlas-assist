@@ -4,20 +4,19 @@ import asyncio
 import pygame
 
 
-def _init_mixer(log):
-    try:
-        pygame.init()
-        pygame.mixer.init()
-        log.success("Mixer initialized.")
-    except pygame.error as e:
-        log.error(f"Mixer initialization failed: {e}")
-
 class Mixer:
     def __init__(self, logger):
         self.log = logger
-        _init_mixer(self.log)
         self.queue = []
         self.stop_event = threading.Event()
+
+    def init_mixer(self, log):
+        try:
+            pygame.init()
+            pygame.mixer.init()
+            log.success("Mixer initialized.")
+        except pygame.error as e:
+            log.error(f"Mixer initialization failed: {e}")
 
     def add_clip(self, clip):
         self.queue.append(clip)

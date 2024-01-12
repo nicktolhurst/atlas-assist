@@ -1,5 +1,4 @@
 import asyncio
-import time
 import traceback
 from mixer import Mixer
 from api_client import APIClient
@@ -10,47 +9,68 @@ import os
 import dotenv
 
 
+async def _initialize_deps(api_client, chat, listener, mixer):
+    # Initialize API Client
+    try:
+        api_client = await api_client.open_session()
+    except Exception as e:
+        log.error(f"Failed to initialize API client: {e}")
+
+    # Initialize Chat Context
+    try:
+        pass
+    except Exception as e:
+        log.error(f"Failed to initialize chat context: {e}")
+
+    # Initialize Listener
+    try:
+        listener = listener.start_listening()
+    except Exception as e:
+        log.error(f"Failed to initialize listener: {e}")
+
+    # Initialize Mixer
+    try:
+        mixer.init_mixer(log)
+    except Exception as e:
+        log.error(f"Failed to initialize Mixer: {e}")
+
+    return api_client, chat, listener, mixer
+
+
 @log.catch
 async def main_async():
-    dotenv.load_dotenv()  # for .env compatibility
-
-    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+    #######################
+    # CONFIGURE UTILITIES #
+    #######################
+    dotenv.load_dotenv()
     log.add("output", rotation="10 MB")
 
-    file_path = "path/to/your/file.txt"
+    ##########################
+    # SERVICE INITIALIZATION #
+    ##########################
+    api_client, chat, listener, mixer = await _initialize_deps(
+        APIClient(log), Chat(log), Listener(log), Mixer(log)
+    )
 
-    try:
-        with open("context_preload", "r") as file:
-            content = file.read()
-        os.environ.setdefault("CONTEXT_PRELOAD", content)
-    except FileNotFoundError:
-        log.warn(
-            f"The file '{file_path}' does not exist. No context will be pre-loaded."
-        )
+    # start mixer and listener background services
+    loop = asyncio.get_running_loop()
+    mixer_ftr = loop.run_in_executor(None, mixer.start_auto_play_loop)
+    # listener_ftr = loop.run_in_executor(None, mixer.start_auto_play_loop)
 
-    log.info(f"Found context to preload:\n{os.environ.get('CONTEXT_PRELOAD')}")
-
-    client = APIClient(log, OPENAI_API_KEY)
-    listener = Listener(log)
-    chat = Chat(log)
-    mixer = Mixer(log)
-
-    listener.start_listening()  # TODO: same pattern for all services?
-
+    #########################
+    # LOCAL SCOPE FUNCTIONS #
+    #########################
     async def _graceful_termination():
-        # Stop the mixer playing on the executor thread.
         mixer.stop_auto_play_loop()
-        # Wait for executor thread to stop.
-        await asyncio.wrap_future(executor)
-        # Close the API client.
-        await client.close_session()
+        await asyncio.wrap_future(mixer_ftr)
+        # listener.stop_listening()
+        # await asyncio.wrap_future(listener_ftr)
+        await api_client.close_session()
 
+    #######################
+    # MAIN LOOP EXECUTION #
+    #######################
     try:
-        await client.open_session()
-
-        loop = asyncio.get_running_loop()
-        executor = loop.run_in_executor(None, mixer.start_auto_play_loop)
-
         # Main Loop
         while True:
             msg, event_id = listener.get_speech_event()
@@ -61,12 +81,12 @@ async def main_async():
 
                 chat.add_msg(Role.USER, msg)
 
-                response = await client.v1_chat_completions_async(chat.context)
+                response = await api_client.v1_chat_completions_async(chat.context)
                 log.info(f"Responding with: '{response.as_text()}'")
 
                 chunks = response.as_chunks()
 
-                clip_gen = client.v1_audio_speech_async(chunks)
+                clip_gen = api_client.v1_audio_speech_async(chunks)
 
                 async for clip in clip_gen:
                     mixer.add_clip(clip)
@@ -91,12 +111,14 @@ async def main_async():
         await _graceful_termination()
 
     finally:
-        # Any final cleanup
         log.success("Program terminated gracefully.")
 
 
+# Script Execution
 if __name__ == "__main__":
     asyncio.run(main_async())
 
+
+# Package Execution
 def main():
     asyncio.run(main_async())

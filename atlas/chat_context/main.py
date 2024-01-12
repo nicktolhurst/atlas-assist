@@ -1,5 +1,4 @@
-import time, os
-
+import time
 
 CHAT_INITIATION_WORDS = ["atlas"]
 
@@ -11,17 +10,18 @@ class Role:
 
 class Chat:
     def __init__(self, logger):
+        self.log = logger
         CONTEXT_PRELOAD = self.get_context_preload()
         self.context = CONTEXT_PRELOAD
         self.context_preload_length = len(CONTEXT_PRELOAD)
-        self.log = logger
-        pass
 
     def get_context(self):
         return self.context, len(self.context)
 
     def add_msg(self, role, msg):
-        self.context.append({"role": role, "content": msg})
+        context = {"role": role, "content": msg}
+        self.context.append(context)
+        self.log.trace(f"Adding context: '{context}'")
 
     async def initiated(self, listener, loop):
         msg = await listener.listen_async(loop)
@@ -34,13 +34,25 @@ class Chat:
         )
         return in_conversation, msg, start_time
 
-    def get_context_preload(self):
+    def get_context_preload(self, preload_path="context_preload"):
+        try:
+            with open(preload_path, "r") as file:
+                content = file.read()
+        except FileNotFoundError:
+            self.log.warn(
+                f"The context preload file '{preload_path}' does not exist. \
+                    Using empty context. Create a file at '{preload_path} and \
+                    add in any context you would like the assistant to be aware \
+                    of at startup."
+            )
+
+        self.log.debug("Initializing chat...")
         return (
             [
-                {"role": "user", "content": os.environ.get("CONTEXT_PRELOAD")},
+                {"role": "user", "content": content},
                 {"role": "assistant", "content": "Ok"},
             ]
-            if os.environ.get
+            if content
             else []
         )
 

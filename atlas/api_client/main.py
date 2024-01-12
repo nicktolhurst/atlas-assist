@@ -1,66 +1,28 @@
+import os
 import aiofiles
 import re
 import time
 from aiohttp import ClientSession
 
 
-class ChatResponse:
-    def __init__(self, response, logger):
-        self.log = logger
-        self.response = response
-        self.message = self.response["choices"][0]["message"]
-        pass
-
-    def as_text(self):
-        return self.message["content"]
-
-    def as_chunks(self, max_chunk_size=50):
-        text = self.as_text()
-        self.log.debug(f'Attempting to chunk: "{text}"')
-        sentences = re.split(r"(?<=[.!?]) +", text)
-        chunks = []
-        current_chunk = ""
-
-        for sentence in sentences:
-            # If adding the next sentence exceeds max length, add the current chunk to the list
-            chunks.append(current_chunk.strip())
-            current_chunk = sentence
-
-            # Check for very long sentences and split further at commas or hyphens
-            while len(current_chunk) > max_chunk_size:
-                sub_chunk, current_chunk = _split_long_sentence(
-                    current_chunk, max_chunk_size
-                )
-                chunks.append(sub_chunk.strip())
-
-        # Add the last chunk if it's not empty
-        if current_chunk:
-            chunks.append(current_chunk.strip())
-
-        # Filter none values
-        chunks = list(filter(None, chunks))
-
-        self.log.debug(f"Split response into {len(chunks)} chunks:")
-        self.log.debug(f"Chunks: {chunks}")
-
-        return chunks
-
-
 class APIClient:
-    def __init__(self, logger, api_key):
+    def __init__(self, logger):
         self.log = logger
-        self.api_key = api_key
+        self.api_key = os.environ.get("OPENAI_API_KEY")
         self.client_session = None
+        self.log.success("API Client initialized.")
 
     async def open_session(self):
         if self.client_session:
             return
         self.client_session = ClientSession()
-        self.log.debug("API Client initialized.")
+        self.log.debug("Opening API Client session...")
+        return self
 
     async def close_session(self):
         if self.client_session:
             await self.client_session.close()
+            self.log.debug("Closing API Client session...")
 
     async def v1_chat_completions_async(
         self, messages, model="gpt-4-vision-preview", max_tokens=500, n=1, temperature=1
@@ -135,3 +97,45 @@ def _split_long_sentence(sentence, max_length):
     )
 
     return sentence[:split_point], sentence[split_point + 1 :]
+
+
+class ChatResponse:
+    def __init__(self, response, logger):
+        self.log = logger
+        self.response = response
+        self.message = self.response["choices"][0]["message"]
+        pass
+
+    def as_text(self):
+        return self.message["content"]
+
+    def as_chunks(self, max_chunk_size=50):
+        text = self.as_text()
+        self.log.debug(f'Attempting to chunk: "{text}"')
+        sentences = re.split(r"(?<=[.!?]) +", text)
+        chunks = []
+        current_chunk = ""
+
+        for sentence in sentences:
+            # If adding the next sentence exceeds max length, add the current chunk to the list
+            chunks.append(current_chunk.strip())
+            current_chunk = sentence
+
+            # Check for very long sentences and split further at commas or hyphens
+            while len(current_chunk) > max_chunk_size:
+                sub_chunk, current_chunk = _split_long_sentence(
+                    current_chunk, max_chunk_size
+                )
+                chunks.append(sub_chunk.strip())
+
+        # Add the last chunk if it's not empty
+        if current_chunk:
+            chunks.append(current_chunk.strip())
+
+        # Filter none values
+        chunks = list(filter(None, chunks))
+
+        self.log.debug(f"Split response into {len(chunks)} chunks:")
+        self.log.debug(f"Chunks: {chunks}")
+
+        return chunks

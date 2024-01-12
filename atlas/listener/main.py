@@ -14,13 +14,14 @@ class Listener:
 
         self.speech_queue = queue.Queue()
         self.listener_thread = threading.Thread(target=self.run_listener, daemon=True)
-        self.log.debug("Listener initialized.")
+        self.log.success("Listener initialized.")
 
     def start_listening(self):
         self.listening = True
         if not self.listener_thread.is_alive():
             self.listener_thread.start()
             self.log.debug("Starting listener...")
+            return self
 
     def stop_listening(self):
         self.listening = False
@@ -58,11 +59,12 @@ class Listener:
                             "Could not request results from Google Speech Recognition service"
                         )
                         raise
-                    
-            except Exception as e:
-                self.log.error(f"An error occurred in the speech recognition process: {e}")
-                raise
 
+            except Exception as e:
+                self.log.error(
+                    f"An error occurred in the speech recognition process: {e}"
+                )
+                raise
 
     def get_speech_event(self):
         try:
