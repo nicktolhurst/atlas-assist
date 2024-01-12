@@ -38,25 +38,31 @@ class Listener:
         while self.listening:
             if self.paused:
                 continue
+            try:
+                with Microphone() as source:
+                    self.recognizer.adjust_for_ambient_noise(source=source, duration=1)
+                    audio = self.recognizer.listen(source)
 
-            with Microphone() as source:
-                self.recognizer.adjust_for_ambient_noise(source=source, duration=1)
-                audio = self.recognizer.listen(source)
+                    try:
+                        text = self.recognizer.recognize_google(audio)
+                        self.speech_queue.put(text)
+                        self.log.info(f"Recognized speech: {text}")
 
-                try:
-                    text = self.recognizer.recognize_google(audio)
-                    self.speech_queue.put(text)
-                    self.log.info(f"Recognized speech: {text}")
+                    except UnknownValueError:
+                        self.log.debug(
+                            "Picked up noise, but didn't recognize it as human voice. Ignoring."
+                        )
 
-                except UnknownValueError:
-                    self.log.debug(
-                        "Picked up noise, but didn't recognize it as human voice. Ignoring."
-                    )
+                    except RequestError:
+                        self.log.error(
+                            "Could not request results from Google Speech Recognition service"
+                        )
+                        raise
+                    
+            except Exception as e:
+                self.log.error(f"An error occurred in the speech recognition process: {e}")
+                raise
 
-                except RequestError:
-                    self.log.error(
-                        "Could not request results from Google Speech Recognition service"
-                    )
 
     def get_speech_event(self):
         try:

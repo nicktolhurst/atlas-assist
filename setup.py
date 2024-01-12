@@ -14,11 +14,12 @@ setup(
         'SpeechRecognition',
         'python-dotenv',
         'pygame',
+        'pyaudio'
     ],
     python_requires='>=3.6',  # Minimum version requirement of the Python interpreter
     entry_points={
         'console_scripts': [
-            'atlas=main:main_async',  # Change 'main:main' to point to your application's entry function
+            'atlas=atlas.main:main',  # Change 'main:main' to point to your application's entry function
         ],
     },
 )

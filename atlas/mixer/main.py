@@ -5,10 +5,12 @@ import pygame
 
 
 def _init_mixer(log):
-    pygame.init()
-    pygame.mixer.init()
-    log.debug("Mixer initialized.")
-
+    try:
+        pygame.init()
+        pygame.mixer.init()
+        log.success("Mixer initialized.")
+    except pygame.error as e:
+        log.error(f"Mixer initialization failed: {e}")
 
 class Mixer:
     def __init__(self, logger):
