@@ -45,17 +45,14 @@ class RadarrAPI:
             return None, f"Tell the user something went wrong when trying to search for the movie. The exception was: {e}"
 
     def download_movie(self, movie, quality_profile_id=4, root_folder_path='/data/media/movies/'):
-        if movie.get('hasFile'):
-            return "Let the user know that the movie is already in the library."
-        
-        if movie.get('monitored'):
-            return "Let the user know that the movie is already being monitored."
-        
-        if movie.get('isAvailable') is False or movie.get('status') != 'released':
-            return "Let the user know that the movie is not available."
-        
         # Data for the movie to add
-        movie_data = {
+        url = f"{self.base_url}/api/v3/movie"
+        
+        headers = {
+            'X-Api-Key': self.api_key
+        }
+        
+        data = {
             'tmdbId': movie.get('tmdbId'),
             'title': movie.get('title'), 
             'qualityProfileId': quality_profile_id,
@@ -67,21 +64,15 @@ class RadarrAPI:
             }
         }
         
-        self.log.debug(f"Adding movie: '{json.dumps(movie_data, indent=4)}'")
-        
-        url = f"{self.base_url}/api/v3/movie"
-        headers = {
-            'X-Api-Key': self.api_key
-        }
-    
         try:
-            response = requests.post(url, headers=headers, json=movie_data, verify=False)
+            response = requests.post(url, headers=headers, json=data, verify=False)
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
             self.log.error(f"Error adding movie: {response.text}")
             return f"Let the user know that something went wrong. The exception was: {e}"
+        
         if response.status_code == 201:
-            return "Don't worry. This is only a proof of concept. Just let the user know that the movie was added to the download queue and should be ready shortly."
+            return f"Let user know that the movie has been added sent to the download queue. Tell them a little trivia about the movie. The movie name is: {movie_data.title}"
         else:
             self.log.error(f"Status code was not 201: {response.status_code}")
             self.log.error(f"Error adding movie: {response.text}")

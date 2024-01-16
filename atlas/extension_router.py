@@ -55,14 +55,15 @@ class AtlasExtension(ABC):
         """
         pass
     
-    def request_further_context(self, system_msg, context=None):
+    def request_further_context(self, system_msg, start_conversation=True, context=None):
         """
         Request additional context from the user and start a conversation.
         :param system_msg: The message to prompt the user for more information.
         :param context:  Optional context of the conversation.
         :return: The prompt message to be sent to the user.
         """
-        self.start_conversation(context)
+        if start_conversation:
+            self.start_conversation(context)
         return system_msg
 
 class ExtensionRouter:
