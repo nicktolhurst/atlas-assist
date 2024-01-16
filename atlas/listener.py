@@ -3,7 +3,6 @@ from speech_recognition import Recognizer, Microphone, UnknownValueError, Reques
 import threading
 import queue
 
-
 class Listener:
     def __init__(self, logger):
         self.log = logger
@@ -14,6 +13,8 @@ class Listener:
 
         self.speech_queue = queue.Queue()
         self.listener_thread = threading.Thread(target=self.run_listener, daemon=True)
+        self.stop_event = threading.Event()
+
         self.log.success("Listener initialized.")
 
     def start_listening(self):

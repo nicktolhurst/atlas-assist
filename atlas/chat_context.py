@@ -4,8 +4,9 @@ CHAT_INITIATION_WORDS = ["atlas"]
 
 
 class Role:
-    USER = "user"
     ASSISTANT = "assistant"
+    USER = "user"
+    SYSTEM = "system"
 
 
 class Chat:

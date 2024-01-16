@@ -1,0 +1,127 @@
+{
+    "title": "Extraction",
+    "originalTitle": "Extraction",
+    "originalLanguage": {
+        "id": 1,
+        "name": "English"
+    },
+    "alternateTitles": [
+        {
+            "sourceType": "tmdb",
+            "movieMetadataId": 0,
+            "title": "Out of the Fire"
+        },
+        {
+            "sourceType": "tmdb",
+            "movieMetadataId": 0,
+            "title": "Dhaka"
+        },
+        {
+            "sourceType": "tmdb",
+            "movieMetadataId": 0,
+            "title": "Resgate"
+        },
+        {
+            "sourceType": "tmdb",
+            "movieMetadataId": 0,
+            "title": "Çıkarma"
+        },
+        {
+            "sourceType": "tmdb",
+            "movieMetadataId": 0,
+            "title": "एक्सट्रैक्शन"
+        },
+        {
+            "sourceType": "tmdb",
+            "movieMetadataId": 0,
+            "title": "タイラー・レイク －命の奪還－：2020"
+        },
+        {
+            "sourceType": "tmdb",
+            "movieMetadataId": 0,
+            "title": "익스트랙션"
+        },
+        {
+            "sourceType": "tmdb",
+            "movieMetadataId": 0,
+            "title": "惊天营救"
+        }
+    ],
+    "secondaryYearSourceId": 0,
+    "sortTitle": "extraction",
+    "sizeOnDisk": 0,
+    "status": "released",
+    "overview": "Tyler Rake, a fearless mercenary who offers his services on the black market, embarks on a dangerous mission when he is hired to rescue the kidnapped son of a Mumbai crime lord.",
+    "digitalRelease": "2020-04-24T00:00:00Z",
+    "images": [
+        {
+            "coverType": "poster",
+            "url": "/rdr/MediaCoverProxy/ba1c280c90ccce18283f86dc0254c335c87b5f2909718363afa90b1e89c2c23e/nygOUcBKPHFTbxsYRFZVePqgPK6.jpg",
+            "remoteUrl": "https://image.tmdb.org/t/p/original/nygOUcBKPHFTbxsYRFZVePqgPK6.jpg"
+        },
+        {
+            "coverType": "fanart",
+            "url": "/rdr/MediaCoverProxy/47cea384f813cca0470ee4455b96928bea259775a822c0378b079eb44be7199a/1R6cvRtZgsYCkh8UFuWFN33xBP4.jpg",
+            "remoteUrl": "https://image.tmdb.org/t/p/original/1R6cvRtZgsYCkh8UFuWFN33xBP4.jpg"
+        }
+    ],
+    "website": "https://www.netflix.com/title/80230399",
+    "remotePoster": "https://image.tmdb.org/t/p/original/nygOUcBKPHFTbxsYRFZVePqgPK6.jpg",
+    "year": 2020,
+    "hasFile": false,
+    "youTubeTrailerId": "L6P3nI6VnlY",
+    "studio": "AGBO",
+    "qualityProfileId": 0,
+    "monitored": false,
+    "minimumAvailability": "tba",
+    "isAvailable": true,
+    "folderName": "",
+    "runtime": 116,
+    "cleanTitle": "extraction",
+    "imdbId": "tt8936646",
+    "tmdbId": 545609,
+    "titleSlug": "545609",
+    "folder": "Extraction (2020)",
+    "certification": "R",
+    "genres": [
+        "Action",
+        "Thriller"
+    ],
+    "tags": [],
+    "added": "0001-01-01T00:00:00Z",
+    "ratings": {
+        "imdb": {
+            "votes": 256761,
+            "value": 6.8,
+            "type": "user"
+        },
+        "tmdb": {
+            "votes": 5682,
+            "value": 7.346,
+            "type": "user"
+        },
+        "metacritic": {
+            "votes": 0,
+            "value": 56,
+            "type": "user"
+        },
+        "rottenTomatoes": {
+            "votes": 0,
+            "value": 67,
+            "type": "user"
+        }
+    },
+    "collection": {
+        "title": "Extraction Collection",
+        "tmdbId": 735127,
+        "monitored": false,
+        "qualityProfileId": 0,
+        "searchOnAdd": false,
+        "minimumAvailability": "tba",
+        "images": [],
+        "added": "0001-01-01T00:00:00Z",
+        "tags": [],
+        "id": 0
+    },
+    "popularity": 53.199
+}

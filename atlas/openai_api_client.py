@@ -3,6 +3,7 @@ import aiofiles
 import re
 import time
 from aiohttp import ClientSession
+from memory_profiler import profile
 
 
 class APIClient:
@@ -92,11 +93,11 @@ def _split_long_sentence(sentence, max_length):
     # Find the last comma or hyphen before max_length
     split_point = max(
         sentence.rfind(",", 0, max_length),
-        sentence.rfind("-", 0, max_length)
-        # sentence.rfind(" ", 0, max_length),
+        sentence.rfind("-", 0, max_length),
+        sentence.rfind(" ", 0, max_length)
     )
-
-    return sentence[:split_point], sentence[split_point + 1 :]
+    
+    return sentence[:split_point], sentence[split_point + 1 :], 
 
 
 class ChatResponse:
@@ -109,13 +110,13 @@ class ChatResponse:
     def as_text(self):
         return self.message["content"]
 
-    def as_chunks(self, max_chunk_size=50):
+    def as_chunks(self, max_chunk_size=120):
         text = self.as_text()
         self.log.debug(f'Attempting to chunk: "{text}"')
         sentences = re.split(r"(?<=[.!?]) +", text)
         chunks = []
         current_chunk = ""
-
+        self.log.debug(f"Split response into {len(sentences)} sentences.")
         for sentence in sentences:
             # If adding the next sentence exceeds max length, add the current chunk to the list
             chunks.append(current_chunk.strip())
@@ -123,6 +124,7 @@ class ChatResponse:
 
             # Check for very long sentences and split further at commas or hyphens
             while len(current_chunk) > max_chunk_size:
+                self.log.debug(f"Current chunk: {current_chunk}")
                 sub_chunk, current_chunk = _split_long_sentence(
                     current_chunk, max_chunk_size
                 )

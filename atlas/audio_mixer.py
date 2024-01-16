@@ -1,8 +1,7 @@
 import os
 import threading
-import asyncio
+import time
 import pygame
-
 
 class Mixer:
     def __init__(self, logger):
@@ -36,8 +35,8 @@ class Mixer:
         if pygame.mixer.music.get_busy():
             pygame.mixer.music.stop()
             pygame.mixer.music.unload()
-        self.log.debug("Stop event detected.")
         self.stop_event.set()
+        self.log.debug("Stop event detected.")
 
     def play(self, clip):
         pygame.mixer.music.load(clip)
@@ -51,10 +50,10 @@ class Mixer:
     def is_playing(self):
         return pygame.mixer.music.get_busy() or self.queue
 
-    async def wait_for_finish(self):
+    def wait_for_finish(self):
         while self.is_playing():
             self.log.trace(f"Waiting for playback to finish...")
-            await asyncio.sleep(1)
+            time.sleep(1)
 
     def delete_clip_from_disk(self, clip):
         try:
