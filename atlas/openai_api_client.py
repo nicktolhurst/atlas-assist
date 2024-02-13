@@ -26,7 +26,7 @@ class APIClient:
             self.log.debug("Closing API Client session...")
 
     async def v1_chat_completions_async(
-        self, messages, model="gpt-4-vision-preview", max_tokens=500, n=1, temperature=1
+        self, messages, model="gpt-4-vision-preview", max_tokens=500, n=1, temperature=1.3
     ):
         json = {
             "model": model,

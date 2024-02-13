@@ -49,7 +49,7 @@ coverage.xml
 .pytest_cache/
 
 weather_api
-
+.tmp
 # Translations
 *.mo
 *.pot

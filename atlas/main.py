@@ -14,8 +14,9 @@ from atlas.openai_api_client import APIClient
 from atlas.listener import Listener
 from atlas.chat_context import Chat, Role
 from atlas.extension_router import AtlasExtension, ExtensionRouter
-from atlas.extensions.weather_api.weather_ext import WeatherExtension
 from atlas.extensions.radarr.ext.radarr_ext import RadarrExtension
+from atlas.extensions.weather.ext.weather_ext import WeatherExtension
+from atlas.extensions.lists.ext.lists_ext import ListExtension
 
 # Add this module to path
 
@@ -66,8 +67,9 @@ async def main_async():
     ##################
     
     router = ExtensionRouter(log)
-    # router.add_extension(WeatherExtension(log))
+    router.add_extension(WeatherExtension(log))
     router.add_extension(RadarrExtension(log))
+    router.add_extension(ListExtension(log))
 
     ##########################
     # SERVICE INITIALIZATION #
@@ -109,10 +111,9 @@ async def main_async():
                     log.debug(f'HANDLED MSG: {handled_msg}')
                     chat.add_msg(Role.SYSTEM, handled_msg)
 
-                log.warning(f"Chat context: {json.dumps(chat.context, indent=4)}")
-
                 response = await api_client.v1_chat_completions_async(chat.context)
                 log.info(f"Responding with: '{response.as_text()}'")
+                chat.add_msg(Role.ASSISTANT, response.as_text())
 
                 chunks = response.as_chunks()
                 clip_gen = api_client.v1_audio_speech_async(chunks)

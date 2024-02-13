@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class AtlasExtension(ABC):
     def __init__(self):
         # Flag to indicate if the extension is in a conversation
@@ -66,6 +67,7 @@ class AtlasExtension(ABC):
             self.start_conversation(context)
         return system_msg
 
+
 class ExtensionRouter:
     def __init__(self, logger):
         self.log = logger
@@ -77,7 +79,8 @@ class ExtensionRouter:
         if not isinstance(service, AtlasExtension):
             raise TypeError("Service must be an instance of AtlasExtension")
         self.extensions.append(service)
-
+        self.log.debug(f"Added extension: {service.__class__.__name__}")
+    
     def route_voice_input(self, voice_input):
         # If there is an active conversation, route input to that extension for follow-up processing
         if self.active_conversation_extension and self.active_conversation_extension.is_in_conversation():
@@ -87,11 +90,7 @@ class ExtensionRouter:
             return self.handle_follow_up(voice_input)
 
         # If no active conversation, check each extension for potential matches.
-        for extension in self.extensions:
-            matching_extensions = []
-            for extension in self.extensions:
-                if extension.can_handle_input(voice_input):
-                    matching_extensions.append(extension)
+        matching_extensions = [extension for extension in self.extensions if extension.can_handle_input(voice_input)]
                     
         if len(matching_extensions) > 1:
             # Ambiguity detected, ask for clarification
@@ -104,8 +103,8 @@ class ExtensionRouter:
                     
             if response:
                 # If the extension starts a conversation, set it as active
-                if extension.is_in_conversation():
-                    self.active_conversation_extension = extension
+                if matching_extensions[0].is_in_conversation():
+                    self.active_conversation_extension = matching_extensions[0]
                 return response
 
         # End the active conversation if no extension responds

@@ -1,4 +1,4 @@
-import time
+import json, os, time
 
 CHAT_INITIATION_WORDS = ["atlas"]
 
@@ -11,18 +11,32 @@ class Role:
 
 class Chat:
     def __init__(self, logger):
+        self.store_path = f"{os.path.dirname(os.path.abspath(__file__))}/chat_history.json"
         self.log = logger
         CONTEXT_PRELOAD = self.get_context_preload()
-        self.context = CONTEXT_PRELOAD
+        self.context = self.load() or CONTEXT_PRELOAD
         self.context_preload_length = len(CONTEXT_PRELOAD)
+        
+    def save(self):
+        with open(self.store_path, 'w') as f:
+            json.dump(self.context, f, indent=4)
+        self.log.debug(f"Saved lists to {self.store_path}")
 
+    def load(self):
+        if os.path.exists(self.store_path):
+            with open(self.store_path, 'r') as f:
+                self.log.debug(f"Loaded chat history from {self.store_path}")
+                return json.load(f)
+        else:
+            self.log.warning(f"Chat history file not found at {self.store_path}. Creating new chat history.")
+            
     def get_context(self):
         return self.context, len(self.context)
 
     def add_msg(self, role, msg):
         context = {"role": role, "content": msg}
         self.context.append(context)
-        self.log.trace(f"Adding context: '{context}'")
+        self.save()
 
     async def initiated(self, listener, loop):
         msg = await listener.listen_async(loop)
